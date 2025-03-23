@@ -45,3 +45,10 @@ QUANDO digito uma senha correta com usuário em branco
 QUANDO digito um usuário com acesso válido com senha em branco
     QUANDO digito um usuário com acesso válido
     Textfield Value Should Be    ${PASSWORD_LOCATOR}    expected=
+
+Realizar Login
+    DADO que estou na página principal
+    QUANDO digito um usuário com acesso válido
+    E digito a senha correta
+    E pressiono o botão 'Login'
+    ENTÃO devo ser redirecinado para a página principal
