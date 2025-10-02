@@ -6,6 +6,7 @@ Library    String
 *** Variables ***
 ${PRODUCT_TITLE}    Products
 @{LIST_NOME_BTN}    Add to cart    Remove
+@{LIST_ORDER_PRODUCTS}    Name (A to Z)    Name (Z to A)    Price (low to high)    Price (high to low)
 
 *** Keywords ***
 DADO que estou na página de inventário
@@ -22,7 +23,7 @@ QUANDO clico no carrinho no produto "${PRODUCT_NAME}"
     ${PRODUCT_NAME}    Replace String    ${PRODUCT_NAME}   ${SPACE}    -
     ${PRODUCT_NAME}    Convert To Lower Case    ${PRODUCT_NAME}
     Click Button    //button[contains(@data-test,'add-to-cart-${PRODUCT_NAME}')]
-    Set Suite Variable    ${TAG_PRODUCT_NAME}    ${PRODUCT_NAME}
+    VAR    ${TAG_PRODUCT_NAME}    ${PRODUCT_NAME}    scope=SUITE
 
 ENTÃO o botão deve mudar para "${NOME_BTN}"
     IF    $NOME_BTN == $LIST_NOME_BTN[0]
@@ -32,7 +33,7 @@ ENTÃO o botão deve mudar para "${NOME_BTN}"
         ${NOME_BTN}    Convert To Lower Case    ${NOME_BTN}
     END
 
-    Set Suite Variable    ${BTN_CARRINHO_LOCATOR}    //button[contains(@data-test,'${NOME_BTN.lower()}-${TAG_PRODUCT_NAME}')]
+    VAR    ${BTN_CARRINHO_LOCATOR}    //button[contains(@data-test,'${NOME_BTN.lower()}-${TAG_PRODUCT_NAME}')]    scope=SUITE
     Element Should Be Visible    ${BTN_CARRINHO_LOCATOR}
 
 E a quantidade de itens no carrinho deve somar um
@@ -42,5 +43,37 @@ E possua o produto "${PRODUCT_NAME}" adicionado ao carrinho
     QUANDO clico no carrinho no produto "${PRODUCT_NAME}"
     ENTÃO o botão deve mudar para "${LIST_NOME_BTN}[1]"
 
+E seja o único produto adicionado ao carrinho
+    Element Text Should Be    //span[contains(@class,'shopping_cart_badge')]   1
+
 QUANDO clico no botão "${NOME_BTN}"
     Click Button    ${BTN_CARRINHO_LOCATOR}
+
+E a quantidade de itens no carrinho deve desaparecer
+    Element Should Not Be Visible    //span[contains(@data-test,'shopping_cart_badge')]
+
+QUANDO seleciono a opção de ordenação "${ORDER_PRODUCT}"
+    VAR    ${ORDER_VALUE}    scope=suite
+    IF    $ORDER_PRODUCT == '${LIST_ORDER_PRODUCTS}[0]'
+        ${ORDER_VALUE}    Replace Variables    az
+    ELSE IF    $ORDER_PRODUCT == '${LIST_ORDER_PRODUCTS}[1]'
+        ${ORDER_VALUE}    Replace Variables    za
+    ELSE IF    $ORDER_PRODUCT == '${LIST_ORDER_PRODUCTS}[2]'
+        ${ORDER_VALUE}    Replace Variables    hilo
+    ELSE IF    $ORDER_PRODUCT == '${LIST_ORDER_PRODUCTS}[3]'
+        ${ORDER_VALUE}    Replace Variables    lohi
+    END
+        
+    Element Text Should Not Be    //span[contains(@data-test, 'active-option')]    ${ORDER_PRODUCT}
+    Click Element    //select[contains(@data-test, 'product-sort-container')]
+    Click Element    //option[contains(@value, '${ORDER_VALUE}')]
+
+ENTÃO os produtos devem ser exibidos em ordem alfabética decrescente
+    Element Text Should Be    //span[contains(@data-test, 'active-option')]    ${LIST_ORDER_PRODUCTS}[1]
+
+ENTÃO os produtos devem ser exibidos em ordem de preço decrescente
+    Element Text Should Be    //span[contains(@data-test, 'active-option')]    ${LIST_ORDER_PRODUCTS}[2]
+
+ENTÃO os produtos devem ser exibidos em ordem de preço crescente
+    Element Text Should Be    //span[contains(@data-test, 'active-option')]    ${LIST_ORDER_PRODUCTS}[3]
+    
