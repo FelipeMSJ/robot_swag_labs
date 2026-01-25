@@ -1,6 +1,5 @@
 *** Settings ***
 Resource    r_geral.robot
-Library    SeleniumLibrary
 Library    FakerLibrary
 
 *** Variables ***
