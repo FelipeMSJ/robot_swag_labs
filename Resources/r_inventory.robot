@@ -20,20 +20,21 @@ ENTÃO devo ser redirecionado para a página do produto "${PRODUCT_NAME}"
     Element Text Should Be    //div[@class='inventory_details_name large_size'][contains(.,'${PRODUCT_NAME}')]    ${PRODUCT_NAME}
 
 QUANDO clico no carrinho no produto "${PRODUCT_NAME}"
-    ${PRODUCT_NAME}    Replace String    ${PRODUCT_NAME}   ${SPACE}    -
-    ${PRODUCT_NAME}    Convert To Lower Case    ${PRODUCT_NAME}
+    ${PRODUCT_NAME} =    Replace String    ${PRODUCT_NAME}   ${SPACE}    -
+    ${PRODUCT_NAME} =    Convert To Lower Case    ${PRODUCT_NAME}
     Click Button    //button[contains(@data-test,'add-to-cart-${PRODUCT_NAME}')]
-    VAR    ${TAG_PRODUCT_NAME}    ${PRODUCT_NAME}    scope=SUITE
 
+    Set Suite Variable    $TAG_PRODUCT_NAME    ${PRODUCT_NAME}
+    
 ENTÃO o botão deve mudar para "${NOME_BTN}"
     IF    $NOME_BTN == $LIST_NOME_BTN[0]
-        ${NOME_BTN}    Replace String    ${NOME_BTN}   ${SPACE}    -
-        ${NOME_BTN}    Convert To Lower Case    ${NOME_BTN}
+        ${NOME_BTN} =    Replace String    ${NOME_BTN}   ${SPACE}    -
+        ${NOME_BTN} =    Convert To Lower Case    ${NOME_BTN}
     ELSE IF  $NOME_BTN == $LIST_NOME_BTN[1]
-        ${NOME_BTN}    Convert To Lower Case    ${NOME_BTN}
+        ${NOME_BTN} =    Convert To Lower Case    ${NOME_BTN}
     END
 
-    VAR    ${BTN_CARRINHO_LOCATOR}    //button[contains(@data-test,'${NOME_BTN.lower()}-${TAG_PRODUCT_NAME}')]    scope=SUITE
+    Set Suite Variable    $BTN_CARRINHO_LOCATOR    //button[contains(@data-test,'${NOME_BTN}-${TAG_PRODUCT_NAME}')]
     Element Should Be Visible    ${BTN_CARRINHO_LOCATOR}
 
 E a quantidade de itens no carrinho deve somar um
@@ -54,14 +55,14 @@ E a quantidade de itens no carrinho deve desaparecer
 
 QUANDO seleciono a opção de ordenação "${ORDER_PRODUCT}"
     VAR    ${ORDER_VALUE}    scope=suite
-    IF    $ORDER_PRODUCT == '${LIST_ORDER_PRODUCTS}[0]'
-        ${ORDER_VALUE}    Replace Variables    az
-    ELSE IF    $ORDER_PRODUCT == '${LIST_ORDER_PRODUCTS}[1]'
-        ${ORDER_VALUE}    Replace Variables    za
-    ELSE IF    $ORDER_PRODUCT == '${LIST_ORDER_PRODUCTS}[2]'
-        ${ORDER_VALUE}    Replace Variables    hilo
-    ELSE IF    $ORDER_PRODUCT == '${LIST_ORDER_PRODUCTS}[3]'
-        ${ORDER_VALUE}    Replace Variables    lohi
+    IF    $ORDER_PRODUCT == $LIST_ORDER_PRODUCTS[0]
+        ${ORDER_VALUE} =    Replace Variables    az
+    ELSE IF    $ORDER_PRODUCT == $LIST_ORDER_PRODUCTS[1]
+        ${ORDER_VALUE} =    Replace Variables    za
+    ELSE IF    $ORDER_PRODUCT == $LIST_ORDER_PRODUCTS[2]
+        ${ORDER_VALUE} =    Replace Variables    hilo
+    ELSE IF    $ORDER_PRODUCT == $LIST_ORDER_PRODUCTS[3]
+        ${ORDER_VALUE} =    Replace Variables    lohi
     END
         
     Element Text Should Not Be    //span[contains(@data-test, 'active-option')]    ${ORDER_PRODUCT}
